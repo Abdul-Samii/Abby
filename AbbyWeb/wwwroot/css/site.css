@@ -1,0 +1,36 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.table-container {
+    border: 1px solid black;
+}
+
+.table-header {
+    border-bottom: 2px solid;
+    justify-items:stretch;
+    padding: 4px;
+}
+
+.table-item {
+    text-align: center;
+}
+
+.header-item {
+    background-color:aqua
+}
