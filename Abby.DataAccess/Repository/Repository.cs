@@ -24,29 +24,29 @@ namespace Abby.DataAccess.Repository
             dbSet.Add(entity);
         }
 
-        public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>>? orderby = null,
-            string? includeProperties=null)
-        {
-            IQueryable<T> query = dbSet;
-			if (filter != null)
-			{
+      public IEnumerable<T> GetAll(Expression<Func<T, bool>>? filter = null,
+          Func<IQueryable<T>, IOrderedQueryable<T>>? orderby = null,
+          string? includeProperties=null)
+      {
+        IQueryable<T> query = dbSet;
+			  if (filter != null)
+			  {
 
-				query = query.Where(filter);
-			}
-			if (includeProperties != null)
-            {
-                foreach(var includeProperty in includeProperties.Split(
-                    new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    query = query.Include(includeProperty);
-                }
-            }
-            if (orderby != null)
-            {
-                return orderby(query).ToList();
-            }
-            return query.ToList();
+				  query = query.Where(filter);
+			  }
+			  if (includeProperties != null)
+        {
+          foreach(var includeProperty in includeProperties.Split(
+            new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+          {
+            query = query.Include(includeProperty);
+          }
+        }
+        if (orderby != null)
+        {
+          return orderby(query).ToList();
+        }
+          return query.ToList();
         }
 
         public T GetFirstOrDefault(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
