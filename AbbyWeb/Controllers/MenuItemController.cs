@@ -1,7 +1,7 @@
 ﻿using Abby.DataAccess.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AbbyWeb.Pages.Controllers
+namespace AbbyWeb.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
