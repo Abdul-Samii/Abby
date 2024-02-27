@@ -1,5 +1,6 @@
 using Abby.DataAccess.Repository.IRepository;
 using Abby.Models;
+using Abby.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,45 +13,47 @@ namespace AbbyWeb.Pages.Customer.Home
     [BindProperties]
     public class DetailsModel : PageModel
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public DetailsModel(IUnitOfWork unitOfWork)
-        {
-            _unitOfWork = unitOfWork;
-        }
+      private readonly IUnitOfWork _unitOfWork;
+      public DetailsModel(IUnitOfWork unitOfWork)
+      {
+        _unitOfWork = unitOfWork;
+      }
 
-        public ShoppingCart ShoppingCart { get; set; }
-        public void OnGet(int id)
+      public ShoppingCart ShoppingCart { get; set; }
+      public void OnGet(int id)
+      {
+        var claimsIdentity = (ClaimsIdentity)User.Identity;
+        var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
+        ShoppingCart = new()
         {
-            var claimsIdentity = (ClaimsIdentity)User.Identity;
-            var claim = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier);
-            ShoppingCart = new()
-            {
-                ApplicationUserId = claim.Value,
-                MenuItem = _unitOfWork.MenuItem.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category"),
-                MenuItemId = id
-            };
-        }
+          ApplicationUserId = claim.Value,
+          MenuItem = _unitOfWork.MenuItem.GetFirstOrDefault(u => u.Id == id, includeProperties: "Category"),
+          MenuItemId = id
+        };
+      }
 
-        public IActionResult OnPost()
+      public IActionResult OnPost()
+      {
+        if (ModelState.IsValid)
         {
-            if (ModelState.IsValid)
-            {
-                ShoppingCart shoppingCartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(
-                    filter: u => u.ApplicationUserId == ShoppingCart.ApplicationUserId &&
-                    u.MenuItemId == ShoppingCart.MenuItemId);
+          ShoppingCart shoppingCartFromDb = _unitOfWork.ShoppingCart.GetFirstOrDefault(
+            filter: u => u.ApplicationUserId == ShoppingCart.ApplicationUserId &&
+            u.MenuItemId == ShoppingCart.MenuItemId);
 
-                if (shoppingCartFromDb == null)
-                {
-                    _unitOfWork.ShoppingCart.Add(ShoppingCart);
-                    _unitOfWork.Save();
-                }
-                else
-                {
-                    _unitOfWork.ShoppingCart.IncrementCount(shoppingCartFromDb, ShoppingCart.Count);
-                }
-                return RedirectToPage("Index");
-            }
-            return Page();
+          if (shoppingCartFromDb == null)
+          {
+            _unitOfWork.ShoppingCart.Add(ShoppingCart);
+            _unitOfWork.Save();
+          HttpContext.Session.SetInt32(SD.SessionCart,
+            _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == ShoppingCart.ApplicationUserId).ToList().Count);
+          }
+          else
+          {
+            _unitOfWork.ShoppingCart.IncrementCount(shoppingCartFromDb, ShoppingCart.Count);
+          }
+          return RedirectToPage("Index");
         }
+        return Page();
+      }
     }
 }
