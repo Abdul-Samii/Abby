@@ -19,14 +19,15 @@ namespace AbbyWeb.Pages.Admin.Order
       _httpClientFactory = httpClientFactory;
       _logger = logger;
     }
-    public async Task OnGet()
+    public async Task OnGet(string? status=null)
     {
       try
       {
         var apiUrl = "https://localhost:44301/api/Order";
+        var apiUrlStatus = $"{apiUrl}?status={status}";
         var httpRequestMessage = new HttpRequestMessage(
             HttpMethod.Get,
-            "https://localhost:44301/api/Order")
+            apiUrlStatus)
         {
           Headers =
             {

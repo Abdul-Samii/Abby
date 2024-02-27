@@ -15,10 +15,15 @@ namespace AbbyWeb.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Get()
+		public IActionResult Get(string? status=null)
 		{
-			var orderDetails = _unitOfWork.OrderHeader.GetAll(includeProperties: "ApplicationUser");
-			return Json(new { data = orderDetails });
+      Console.WriteLine($"Received status: {status}");
+      var orderHeaderList = _unitOfWork.OrderHeader.GetAll(includeProperties: "ApplicationUser");
+			if (status != null)
+			{
+				orderHeaderList = orderHeaderList.Where(u => u.Status.Equals(status, StringComparison.OrdinalIgnoreCase));
+			}
+			return Json(new { data = orderHeaderList });
 		}
 	}
 }
